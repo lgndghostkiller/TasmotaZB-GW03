@@ -19,12 +19,13 @@
 
 #pragma once
 
-#ifdef ESP32
+#if defined(ESP32) || defined(ARDUINO_ARCH_ESP32)
 #include "esp8266toEsp32.h"
 // Modul
 #undef MODULE
 #define MODULE WEMOS // [Module] Select default model
 #endif  // ESP32
+
 
 #ifdef ESP8266
 // ESP8266
