@@ -20,7 +20,7 @@
 #pragma once
 
 #ifdef ESP32
-#include <esp8266toEsp32.h>
+#include "esp8266toEsp32.h"
 // Modul
 #undef MODULE
 #define MODULE WEMOS // [Module] Select default model
