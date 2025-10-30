@@ -28,7 +28,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "user_interface.h"
+// vorher (problematisch auf ESP32)
+// #include "user_interface.h"
+
+// nachher
+#if defined(ESP8266)
+  #include "user_interface.h"
+#endif
 #ifdef __cplusplus
 }
 #endif
