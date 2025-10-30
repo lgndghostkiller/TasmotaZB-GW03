@@ -20,7 +20,9 @@ jobs:
         run: pip install -U platformio
 
       - name: Build env tasmota32-zigbee-tcp
-        run: pio run -e tasmota32-zigbee-tcp
+        run: |
+          pio run -t clean -e tasmota32-zigbee-tcp
+          pio run -e tasmota32-zigbee-tcp
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
