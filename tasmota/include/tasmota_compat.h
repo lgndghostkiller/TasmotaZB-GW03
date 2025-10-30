@@ -19,6 +19,16 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#ifndef SINT_TYPES_DEFINED
+  typedef int8_t   sint8_t;
+  typedef int16_t  sint16_t;
+  typedef int32_t  sint32_t;
+  #define SINT_TYPES_DEFINED
+#endif
+
+
 #if defined(ESP32) || defined(ARDUINO_ARCH_ESP32)
 #include "esp8266toEsp32.h"
 // Modul
