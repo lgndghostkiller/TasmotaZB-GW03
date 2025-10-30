@@ -1,4 +1,11 @@
 #pragma once
-#include <HTTPClient.h>
-// Einige Libs referenzieren den Typnamen "ESP8266HTTPClient" – Alias dafür:
-using ESP8266HTTPClient = HTTPClient;
+
+#if defined(ARDUINO_ARCH_ESP32)
+  #include <Arduino.h>
+  #include <WiFi.h>
+  #include <WiFiClient.h>
+  #include <HTTPClient.h>
+  using ESP8266HTTPClient = HTTPClient;
+#else
+  #include <ESP8266HTTPClient.h>
+#endif
