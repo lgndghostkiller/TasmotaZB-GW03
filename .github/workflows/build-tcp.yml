@@ -1,0 +1,29 @@
+name: Build TCP Zigbee
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PlatformIO
+        run: pip install -U platformio
+
+      - name: Build env tasmota32-zigbee-tcp
+        run: pio run -e tasmota32-zigbee-tcp
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: tasmota32-zigbee-tcp
+          path: .pio/build/tasmota32-zigbee-tcp/firmware.bin
