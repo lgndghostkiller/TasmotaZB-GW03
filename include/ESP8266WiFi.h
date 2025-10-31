@@ -1,3 +1,8 @@
 #pragma once
-// Shim für ESP32: alte ESP8266-Header-Referenz abfangen
-#include <WiFi.h>
+#if defined(ARDUINO_ARCH_ESP32)
+  #include <WiFi.h>
+  using ESP8266WiFiClass = WiFiClass;
+  #define ESP8266WiFi WiFi
+#else
+  #include <ESP8266WiFi.h>
+#endif
