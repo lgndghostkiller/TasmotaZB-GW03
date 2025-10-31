@@ -1,25 +1,29 @@
+# tools/filter_no_berry.py
+from SCons.Script import Import
 Import("env")
 
-from SCons.Script import DefaultEnvironment
-import os
+BLOCK_SUBSTRINGS = (
+    "berry",            # alle Berry-Dateien
+    "xdrv_52_",         # Berry driver
+    "xsns_92_berry",    # Berry sensor
+    "xbp_berry",        # Berry packages
+)
 
-# Entfernt alle Berry-bezogenen Quellen, ohne andere Tasmota-Module zu killen
-def exclude_berry_sources(src):
-    exts = (".ino", ".cpp", ".c")
-    blocked = []
-    for s in list(src):
-        path = str(s)
-        low = path.lower()
-        if (
-            ("berry" in low) or
-            ("xdrv_52_" in low) or
-            ("xsns_92_berry" in low) or
-            ("xbp_berry" in low)
-        ) and path.endswith(exts):
-            blocked.append(s)
-            src.remove(s)
-    if blocked:
-        print("🔒 Berry sources excluded by filter_no_berry.py ({} files)".format(len(blocked)))
-    return src
+BLOCK_EXTS = (".ino", ".cpp", ".c")
 
-env.AddBuildMiddleware(exclude_berry_sources, "*")
+def berry_filter(node):
+    """
+    Wird pro zu bauender Quelldatei aufgerufen.
+    Return:
+      - None  -> Datei wird ausgeschlossen
+      - node  -> Datei bleibt im Build
+    """
+    path = str(node)
+    low = path.lower()
+    if path.endswith(BLOCK_EXTS) and any(s in low for s in BLOCK_SUBSTRINGS):
+        print(f"🔒 Exclude Berry source: {path}")
+        return None
+    return node
+
+# auf alle Quellen anwenden
+env.AddBuildMiddleware(berry_filter, "*")
