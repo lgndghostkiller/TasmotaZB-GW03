@@ -56,5 +56,5 @@
 #ifdef USE_BERRY_PSRAM
 #undef USE_BERRY_PSRAM
 #endif
-
+#undef USE_BERRY
 #endif  // _USER_CONFIG_OVERRIDE_H_
