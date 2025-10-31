@@ -1,3 +1,7 @@
 #pragma once
-/* Stub: verhindert Build-Fehler, wenn Berry deaktiviert ist.
-   Diese Datei wird nur genutzt, wenn xdrv_52_* versehentlich mitkompiliert wird. */
+// Stub für Builds ohne Berry
+#ifndef USE_BERRY
+// absichtlich leer
+#else
+#error "berry.h: Stub aktiv, aber USE_BERRY ist definiert."
+#endif
