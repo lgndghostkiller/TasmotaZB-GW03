@@ -1,2 +1,6 @@
 #pragma once
-#include <ESPmDNS.h>   // MDNS Objekt ist identisch benannt
+#if defined(ARDUINO_ARCH_ESP32)
+  #include <ESPmDNS.h>
+#else
+  #include <ESP8266mDNS.h>
+#endif
