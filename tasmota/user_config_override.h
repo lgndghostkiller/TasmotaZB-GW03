@@ -1,9 +1,6 @@
 #ifndef _USER_CONFIG_OVERRIDE_H_
 #define _USER_CONFIG_OVERRIDE_H_
 
-// Enable overrides
-#define USE_CONFIG_OVERRIDE
-
 // === Zigbee-Bridge Fixes ===
 #ifdef USE_ZIGBEE_ZNP
 #undef USE_ZIGBEE_ZNP
