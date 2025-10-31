@@ -1,10 +1,12 @@
 name: Build TCP Zigbee
+
 on:
   workflow_dispatch: {}
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout (with submodules)
         uses: actions/checkout@v4
@@ -14,15 +16,43 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install PlatformIO
-        run: pip install -U platformio
+        run: |
+          python -m pip install --upgrade pip
+          pip install platformio
+
+      # Optional: einmalig aktivieren, wenn Pakete „verklemmt“ sind
+      - name: PlatformIO purge (optional)
+        run: pio pkg purge --global --yes || true
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            .pio
+          key: pio-${{ runner.os }}-${{ hashFiles('**/platformio.ini', '**/platformio_*.ini') }}
+
+      # Workaround für espressif32@6.6.0 + Arduino 3.0.7:
+      # erwartet zusätzlich 'framework-arduinoespressif32-libs'
+      - name: Preinstall Arduino-ESP32 3.0.7 libs
+        run: |
+            pio pkg install -g -p "platformio/framework-arduinoespressif32-libs@3.0.7" || true
+            # Info ausgeben, was installiert wurde
+            pio pkg list --global || true
+
+      - name: Show resolved PIO config (debug)
+        run: |
+          pio --version
+          pio project config
+
+      - name: Clean
+        run: pio run -t clean -e tasmota32-zigbee-tcp
 
       - name: Build env tasmota32-zigbee-tcp
-        run: |
-          pio run -t clean -e tasmota32-zigbee-tcp
-          pio run -e tasmota32-zigbee-tcp
+        run: pio run -e tasmota32-zigbee-tcp
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
