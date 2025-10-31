@@ -4,9 +4,8 @@
   #include <WiFi.h>
   #include <WiFiClient.h>
   #include <HTTPClient.h>
+  #include <Update.h>
   #include <HTTPUpdate.h>
-  // Auf ESP8266 heißt die Klasse/Instanz ESPhttpUpdate.
-  // Auf ESP32 heißt sie HTTPUpdate/httpUpdate.
   using ESP8266HTTPUpdate = HTTPUpdate;
   #define ESPhttpUpdate httpUpdate
 #else
