@@ -1458,4 +1458,9 @@
   #define USE_I2S_OPUS
 #endif // USE_I2S_ALL
 
+// --- user overrides (must be last) ---
+#if __has_include("user_config_override.h")
+  #include "user_config_override.h"
+#endif
+
 #endif  // _MY_USER_CONFIG_H_
