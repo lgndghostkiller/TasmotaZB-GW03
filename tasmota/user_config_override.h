@@ -49,4 +49,12 @@
 // #undef PIO_FRAMEWORK_ARDUINO_MMU_CACHE16_IRAM48_SECHEAP_SHARED
 // #endif
 
+#ifdef USE_BERRY
+#undef USE_BERRY
+#endif
+
+#ifdef USE_BERRY_PSRAM
+#undef USE_BERRY_PSRAM
+#endif
+
 #endif  // _USER_CONFIG_OVERRIDE_H_
