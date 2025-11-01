@@ -1,10 +1,16 @@
 name: Build TCP Zigbee
 on:
   workflow_dispatch: {}
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout (with submodules)
         uses: actions/checkout@v4
@@ -19,33 +25,43 @@ jobs:
       - name: Install PlatformIO
         run: pip install -U platformio
 
-      # Optional: einmalig aktivieren, wenn Pakete „verklemmt“ sind
-      #- name: PlatformIO purge (optional)
-      #  run: pio pkg purge --global --yes || true
+      # --- CACHE: PlatformIO Pakete (schneller Build!) ---
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio/.cache
+            ~/.platformio/packages
+            ~/.platformio/platforms
+            ~/.platformio/toolchains
+          key: pio-cache-${{ runner.os }}-${{ hashFiles('platformio.ini', 'platformio_override.ini') }}
+          restore-keys: |
+            pio-cache-${{ runner.os }}-
 
-      - name: Clean PlatformIO packages cache
-        run: rm -rf ~/.platformio/packages ~/.platformio/.cache
-
-
-      - name: Prune PIO caches (sauberer Runner)
-        run: pio system prune -f
-
-      - name: Show effective config
-        run: pio project config
-
+      # --- CLEAN & BUILD ---
       - name: Clean + Build
         run: |
           pio run -t clean -e tasmota32-zigbee-tcp
           pio run -e tasmota32-zigbee-tcp
 
-
-      #- name: Build env tasmota32-zigbee-tcp
-      #  run: |
-      #    pio run -t clean -e tasmota32-zigbee-tcp
-      #    pio run -e tasmota32-zigbee-tcp
-
-      - name: Upload firmware
+      # --- UPLOAD: Korrekte .bin Datei! ---
+      - name: Upload Firmware
         uses: actions/upload-artifact@v4
         with:
           name: tasmota32-zigbee-tcp
-          path: .pio/build/tasmota32-zigbee-tcp/firmware.bin
+          path: .pio/build/tasmota32-zigbee-tcp/tasmota32-zigbee-tcp.bin   # <<< KORREKT!
+
+      # --- OPTIONAL: Release bei Push auf main ---
+      - name: Create Release (on main)
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: .pio/build/tasmota32-zigbee-tcp/tasmota32-zigbee-tcp.bin
+          tag_name: latest
+          name: Latest TCP Zigbee Bridge
+          body: |
+            Automatischer Build von `tasmota32-zigbee-tcp.bin`
+            - EZSP TCP Bridge für ZB-GW03
+            - Kanal 11, Ethernet, EEPROM
+          draft: false
+          prerelease: false
