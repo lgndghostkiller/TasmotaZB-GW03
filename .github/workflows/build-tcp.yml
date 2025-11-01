@@ -20,16 +20,26 @@ jobs:
         run: pip install -U platformio
 
       # Optional: einmalig aktivieren, wenn Pakete „verklemmt“ sind
-      - name: PlatformIO purge (optional)
-        run: pio pkg purge --global --yes || true
+      #- name: PlatformIO purge (optional)
+      #  run: pio pkg purge --global --yes || true
 
       - name: Prune PIO caches (sauberer Runner)
         run: pio system prune -f
 
-      - name: Build env tasmota32-zigbee-tcp
+      - name: Show effective config
+        run: pio project config
+
+      - name: Clean + Build
         run: |
+          pio pkg purge
           pio run -t clean -e tasmota32-zigbee-tcp
           pio run -e tasmota32-zigbee-tcp
+
+
+      #- name: Build env tasmota32-zigbee-tcp
+      #  run: |
+      #    pio run -t clean -e tasmota32-zigbee-tcp
+      #    pio run -e tasmota32-zigbee-tcp
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
