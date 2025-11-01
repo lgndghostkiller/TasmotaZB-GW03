@@ -1,37 +1,34 @@
+# tools/filter_no_berry.py
 Import("env")
+
+# Aktuelles SRC_FILTER übernehmen (kann str, list oder None sein)
+src_filter = env.get("SRC_FILTER")
 
 def _to_list(x):
     if x is None:
         return []
     if isinstance(x, (list, tuple)):
         return list(x)
-    return [str(x)]
+    return str(x).split()
 
-# Aktuellen Filter holen (kann str, list oder None sein)
-current = env.get("BUILD_SRC_FILTER")
-flt_list = []
+flt = _to_list(src_filter)
 
-if isinstance(current, str):
-    # splitte grob an Whitespaces
-    flt_list = current.split()
-elif isinstance(current, (list, tuple)):
-    flt_list = list(current)
-else:
-    # Standardbasis: alles erlauben, VCS ausnehmen
-    flt_list = ["+<*>", "-<.git/>", "-<.svn/>"]
+# Basis sicherstellen: alles erlauben, VCS ignorieren
+if not flt:
+    flt = ["+<*>", "-<.git/>", "-<.svn/>"]
 
-# Berry-Regeln hinzufügen (ohne Duplikate)
+# Nur Berry rausschmeißen (pfad-gezielt, ohne Kollateralschäden)
 berry_rules = [
-    "-<**/xdrv_52_*.ino>",
-    "-<**/*berry*.ino>",
-    "-<**/xsns_92_berry*.ino>",
-    "-<**/xbp_berry*.ino>",
+    "-<tasmota/berry/>",
+    "-<tasmota/xdrv_52_*.ino>",
+    "-<tasmota/xsns_92_berry*.ino>",
+    "-<tasmota/xbp_berry*.ino>",
 ]
 
 for r in berry_rules:
-    if r not in flt_list:
-        flt_list.append(r)
+    if r not in flt:
+        flt.append(r)
 
-# Zurückschreiben als String (kompatibel für alle PIO-Versionen)
-env.Replace(BUILD_SRC_FILTER=" ".join(flt_list))
-print("🔒 Berry sources excluded via extra_script (BUILD_SRC_FILTER updated)")
+# Jetzt die WIRKLICHE Variable setzen
+env.Replace(SRC_FILTER=" ".join(flt))
+print("🔒 Berry sources excluded via extra_script (minimal, SRC_FILTER updated)")
