@@ -2,59 +2,69 @@
 #ifndef _USER_CONFIG_OVERRIDE_H_
 #define _USER_CONFIG_OVERRIDE_H_
 
-// zwingt Tasmota, diese Datei zu laden
+// --- ZWINGEND: Tasmota lädt diese Datei ---
 #define USE_CONFIG_OVERRIDE
 
-/**************
- * Ziel: ESP32 + Zigbee EZSP (Silabs) als TCP-Bridge
- * -> Kein ZNP, kein Berry, kein TLS, keine SD_MMC
- **************/
+// ========================================
+// ZIEL: ESP32 + EFR32 (EZSP) als reine TCP-Bridge
+// Kein ZNP, Berry, TLS, SD, Script, Display, IR, RF
+// ========================================
 
-// Safety: Alles, was Probleme machte, hart abwählen
-#ifdef USE_BERRY
-#undef USE_BERRY
-#endif
-#ifdef USE_ZIGBEE_ZNP
-#undef USE_ZIGBEE_ZNP
-#endif
-#ifdef USE_TLS
-#undef USE_TLS
-#endif
-#ifdef USE_SCRIPT
-#undef USE_SCRIPT
-#endif
-#ifdef USE_SDCARD
+// === 1. EXPLIZIT DEAKTIVIEREN (verhindert Include-Fehler) ===
+#undef USE_SD_CARD
+#undef USE_SD_CARD_MMC
 #undef USE_SDCARD
-#endif
-
-// Wir wollen EZSP + TCP-Bridge — die Defines kommen primär aus der INI,
-// hier nur als Fallback (schadet nicht, wenn doppelt identisch definiert).
-#ifndef USE_ZIGBEE
-#define USE_ZIGBEE
-#endif
-#ifndef USE_ZIGBEE_EZSP
-#define USE_ZIGBEE_EZSP
-#endif
-#ifndef USE_TCP_BRIDGE
-#define USE_TCP_BRIDGE
-#endif
-
-// Optional: Webserver schlank halten
-//#ifdef USE_EMULATION
-//#undef USE_EMULATION
-//#endif
-
-// Falls Dein Build PSRAM-Zeug nicht mag, auslassen:
-// #ifdef PIO_FRAMEWORK_ARDUINO_MMU_CACHE16_IRAM48_SECHEAP_SHARED
-// #undef PIO_FRAMEWORK_ARDUINO_MMU_CACHE16_IRAM48_SECHEAP_SHARED
-// #endif
-
-#ifdef USE_BERRY
 #undef USE_BERRY
-#endif
-
-#ifdef USE_BERRY_PSRAM
 #undef USE_BERRY_PSRAM
-#endif
-#undef USE_BERRY
+#undef USE_ZIGBEE_ZNP
+#undef USE_TLS
+#undef USE_SCRIPT
+#undef USE_DISPLAY
+#undef USE_IR_REMOTE
+#undef USE_IR_REMOTE_FULL
+#undef USE_RC_SWITCH
+#undef USE_RF_FLASH
+#undef USE_EMULATION
+#undef USE_EMULATION_HUE
+#undef USE_EMULATION_WEMO
+
+// === 2. ZIGBEE EZSP + TCP BRIDGE AKTIVIEREN ===
+#define USE_ZIGBEE
+#define USE_ZIGBEE_EZSP
+#define USE_TCP_BRIDGE
+
+// === 3. ZUSÄTZLICHE OPTIMIERUNGEN (optional, aber empfohlen) ===
+// Ethernet für ZB-GW03
+#define USE_ETHERNET
+
+// EEPROM für Zigbee-Netzwerk (I2C, GPIO32/33)
+#define USE_ZIGBEE_EEPROM
+
+// Fixer Zigbee-Kanal (EU: 11–26, 11 = stabil)
+#define USE_ZIGBEE_CHANNEL 11
+
+// LittleFS für OTA & Config (statt SPIFFS)
+#define USE_UFILESYS
+#define USE_LITTLEFS
+
+// Minimales Logging (spart RAM/Flash)
+#define SERIAL_LOG_LEVEL 0  // Kein Serial-Log im Bridge-Modus
+
+// === 4. GPIO / UART für EZSP (ZB-GW03 v1.2 Standard) ===
+#define ZIGBEE_DOUT_GPIO 1   // TX → EFR32 (GPIO1)
+#define ZIGBEE_DIN_GPIO  3   // RX ← EFR32 (GPIO3)
+
+// === 5. Ethernet PHY (LAN8720) ===
+#undef ETH_TYPE
+#define ETH_TYPE 0
+#undef ETH_CLKMODE
+#define ETH_CLKMODE 3
+
+// === 6. PSRAM deaktivieren (ZB-GW03 hat keins) ===
+#undef USE_PSRAM
+#undef PIO_FRAMEWORK_ARDUINO_MMU_CACHE16_IRAM48_SECHEAP_SHARED
+
+// === 7. Sonstiges ===
+#define ROTATE_ZIGBEE  // Optional: Zigbee-Reset bei Boot
+
 #endif  // _USER_CONFIG_OVERRIDE_H_
