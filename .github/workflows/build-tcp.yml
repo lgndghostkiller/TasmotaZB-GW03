@@ -23,6 +23,10 @@ jobs:
       #- name: PlatformIO purge (optional)
       #  run: pio pkg purge --global --yes || true
 
+      - name: Clean PlatformIO packages cache
+        run: rm -rf ~/.platformio/packages ~/.platformio/.cache
+
+
       - name: Prune PIO caches (sauberer Runner)
         run: pio system prune -f
 
@@ -31,7 +35,6 @@ jobs:
 
       - name: Clean + Build
         run: |
-          pio pkg purge
           pio run -t clean -e tasmota32-zigbee-tcp
           pio run -e tasmota32-zigbee-tcp
 
